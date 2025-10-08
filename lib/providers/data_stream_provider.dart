@@ -8,6 +8,7 @@ import '../providers/connection_provider.dart';
 import '../providers/alerts_provider.dart';
 import '../providers/thresholds_provider.dart';
 import '../providers/mqtt_control_publisher_provider.dart';
+import '../services/database_service.dart';
 import '../core/utils.dart';
 
 // Provider quản lý kết nối và streaming dữ liệu
@@ -68,7 +69,25 @@ class DataStreamService {
   }
   
   Future<void> sendControlCommand(String deviceId, String command) async {
-    final mqttPublisher = ref.read(mqttControlPublisherProvider);
-    await mqttPublisher.publishControl(deviceId, command);
+    try {
+      final mqttPublisher = ref.read(mqttControlPublisherProvider);
+      await mqttPublisher.publishControl(deviceId, command);
+      
+      // Save to database
+      await DatabaseService.saveControlCommand(
+        deviceId: deviceId,
+        command: command,
+        success: true,
+      );
+    } catch (e) {
+      print('❌ Error sending control command: $e');
+      
+      // Save failed command to database
+      await DatabaseService.saveControlCommand(
+        deviceId: deviceId,
+        command: command,
+        success: false,
+      );
+    }
   }
 }

@@ -12,7 +12,7 @@ class NotificationService {
     const settings = InitializationSettings(android: android, iOS: ios);
     await _notifications.initialize(settings);
   }
-
+// đi nhanh chu
   static Future<void> showAlert(String title, String body) async {
     const android = AndroidNotificationDetails(
       'alerts', 'Alerts',
