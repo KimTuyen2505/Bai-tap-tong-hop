@@ -41,6 +41,10 @@ class ScaffoldWithBottomNavBar extends StatelessWidget {
           label: 'Analytics',
         ),
         BottomNavigationBarItem(
+          icon: Icon(Icons.history),
+          label: 'History',
+        ),
+        BottomNavigationBarItem(
           icon: Icon(Icons.settings),
           label: 'Settings',
         ),
@@ -53,7 +57,8 @@ class ScaffoldWithBottomNavBar extends StatelessWidget {
     if (location.startsWith('/devices')) return 1;
     if (location.startsWith('/alerts')) return 2;
     if (location.startsWith('/analytics')) return 3;
-    if (location.startsWith('/settings')) return 4;
+    if (location.startsWith('/history')) return 4;
+    if (location.startsWith('/settings')) return 5;
     return 0;
   }
 
@@ -72,6 +77,9 @@ class ScaffoldWithBottomNavBar extends StatelessWidget {
         context.go('/analytics');
         break;
       case 4:
+        context.go('/history');
+        break;
+      case 5:
         context.go('/settings');
         break;
     }
