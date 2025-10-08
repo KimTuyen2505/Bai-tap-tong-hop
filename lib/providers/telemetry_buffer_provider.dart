@@ -3,22 +3,42 @@ import '../models/telemetry.dart';
 import '../core/config.dart';
 
 class TelemetryBuffer {
-  final List<Telemetry> _buffer = [];
+  final List<Telemetry> values;
   final int maxSize;
-  TelemetryBuffer({required this.maxSize});
+  
+  const TelemetryBuffer({
+    required this.values,
+    required this.maxSize,
+  });
 
-  List<Telemetry> get values => List.unmodifiable(_buffer);
-
-  void add(Telemetry t) {
-    _buffer.add(t);
-    if (_buffer.length > maxSize) {
-      _buffer.removeAt(0);
+  TelemetryBuffer copyWithAdded(Telemetry t) {
+    final newList = List<Telemetry>.from(values)..add(t);
+    if (newList.length > maxSize) {
+      newList.removeAt(0);
     }
+    return TelemetryBuffer(values: newList, maxSize: maxSize);
   }
 
-  void clear() => _buffer.clear();
+  TelemetryBuffer copyWithCleared() {
+    return TelemetryBuffer(values: [], maxSize: maxSize);
+  }
 }
 
-final telemetryBufferProvider = Provider.family<TelemetryBuffer, String>((ref, deviceId) {
-  return TelemetryBuffer(maxSize: AppConfig.telemetryBufferSize);
-});
+class TelemetryBufferNotifier extends StateNotifier<TelemetryBuffer> {
+  TelemetryBufferNotifier(int maxSize)
+      : super(TelemetryBuffer(values: [], maxSize: maxSize));
+
+  void add(Telemetry t) {
+    state = state.copyWithAdded(t);
+  }
+
+  void clear() {
+    state = state.copyWithCleared();
+  }
+}
+
+final telemetryBufferProvider = StateNotifierProvider.family<TelemetryBufferNotifier, TelemetryBuffer, String>(
+  (ref, deviceId) {
+    return TelemetryBufferNotifier(AppConfig.telemetryBufferSize);
+  },
+);

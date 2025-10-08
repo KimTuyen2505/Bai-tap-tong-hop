@@ -28,8 +28,7 @@ class DevicesScreen extends ConsumerWidget {
           final deviceId = devices[index];
           return Consumer(
             builder: (context, ref, _) {
-              final telemetryBuffer =
-                  ref.watch(telemetryBufferProvider(deviceId));
+              final telemetryBuffer = ref.watch(telemetryBufferProvider(deviceId));
               final threshold = ref.watch(thresholdsProvider(deviceId));
               final isOnline = ref.watch(onlineStatusProvider(deviceId));
 
@@ -58,10 +57,8 @@ class DevicesScreen extends ConsumerWidget {
                   },
                   threshold: threshold,
                   onThresholdChanged: (value) {
-                    ref.read(thresholdsProvider(deviceId).notifier).state =
-                        value;
-                    _sendControlCommand(
-                        ref, deviceId, "THRESHOLD_$value");
+                    ref.read(thresholdsProvider(deviceId).notifier).state = value;
+                    _sendControlCommand(ref, deviceId, "THRESHOLD_$value");
                   },
                 ),
               );
@@ -109,10 +106,8 @@ class DevicesScreen extends ConsumerWidget {
     );
   }
 
-  void _sendControlCommand(
-      WidgetRef ref, String deviceId, String command) {
+  void _sendControlCommand(WidgetRef ref, String deviceId, String command) {
     final dataStream = ref.read(dataStreamProvider);
     dataStream.sendControlCommand(deviceId, command);
-    print('Sending command to $deviceId: $command');
   }
 }

@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mobile_app/providers/device_provider.dart';
-import 'package:mobile_app/providers/mqtt_control_publisher_provider.dart';
 import 'dart:async';
 import '../services/ws_source.dart';
 import '../providers/telemetry_buffer_provider.dart';
 import '../providers/connection_provider.dart';
 import '../providers/alerts_provider.dart';
 import '../providers/thresholds_provider.dart';
+import '../providers/mqtt_control_publisher_provider.dart';
 import '../core/utils.dart';
 
 // Provider quản lý kết nối và streaming dữ liệu
@@ -53,9 +53,7 @@ class DataStreamService {
   }
   
   void _onTelemetryReceived(dynamic telemetry) {
-    // Thêm dữ liệu vào buffer của device
-    final buffer = ref.read(telemetryBufferProvider(telemetry.deviceId));
-    buffer.add(telemetry);
+    ref.read(telemetryBufferProvider(telemetry.deviceId).notifier).add(telemetry);
 
     // Update danh sách devices tự động
     ref.read(devicesProvider.notifier).updateFromTelemetry(telemetry);
@@ -69,8 +67,8 @@ class DataStreamService {
     }
   }
   
-  void sendControlCommand(String deviceId, String command) {
+  Future<void> sendControlCommand(String deviceId, String command) async {
     final mqttPublisher = ref.read(mqttControlPublisherProvider);
-    mqttPublisher.publishControl(deviceId, command);
+    await mqttPublisher.publishControl(deviceId, command);
   }
 }
